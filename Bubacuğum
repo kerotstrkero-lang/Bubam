@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Babacım Vatana Gidelim</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            overflow: hidden; /* Prevent scrolling during button chase */
+        }
+
+        /* Custom Animations */
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.8); }
+        }
+
+        .animate-glow {
+            animation: pulse-green 2s infinite;
+        }
+
+        .transition-transform-custom {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.3s ease, left 0.3s ease;
+        }
+
+        /* Fullscreen Expansion Animation */
+        .expand-fullscreen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            border-radius: 0 !important;
+            font-size: 5rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-center text-white relative">
+
+    <!-- Main Container -->
+    <div id="app-container" class="relative z-10 flex flex-col items-center gap-12 p-8 max-w-4xl w-full text-center">
+        
+        <!-- Header -->
+        <h1 class="text-3xl md:text-5xl font-black tracking-tight leading-tight uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 drop-shadow-lg">
+            Babacım, Vatana gidip bilgisayarı bugün alalım mı?
+        </h1>
+
+        <!-- Buttons Container -->
+        <div class="flex flex-col md:flex-row gap-8 items-center justify-center w-full min-h-[200px] relative">
+            
+            <!-- Button 1: Success -->
+            <button id="btn-yes" class="group relative px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-bold text-xl rounded-xl shadow-lg transform transition hover:scale-105 active:scale-95 focus:outline-none ring-2 ring-green-400 ring-opacity-50">
+                <span class="relative z-10 flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Arabayı Hazırladım!
+                </span>
+                <div class="absolute inset-0 h-full w-full rounded-xl bg-gradient-to-r from-green-400 to-green-600 opacity-0 group-hover:opacity-20 transition-opacity"></div>
+            </button>
+
+            <!-- Button 2: The Runner -->
+            <div class="relative group">
+                <button id="btn-no" class="px-8 py-4 bg-red-600 text-white font-bold text-xl rounded-xl shadow-lg transform transition-transform-custom cursor-pointer relative z-20 hover:shadow-red-500/50">
+                    Sonra alırız...
+                </button>
+                <!-- Message that appears after 5-6 runs -->
+                <div id="stop-message" class="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 text-gray-400 text-sm font-medium opacity-0 transition-opacity duration-500 whitespace-nowrap pointer-events-none">
+                    Tamam, daha tuş kaçmayacak
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Background Elements for Visual Flair -->
+    <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-green-900 rounded-full mix-blend-screen filter blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-red-900 rounded-full mix-blend-screen filter blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnYes = document.getElementById('btn-yes');
+            const btnNo = document.getElementById('btn-no');
+            const stopMessage = document.getElementById('stop-message');
+            const container = document.getElementById('app-container');
+
+            let runCount = 0;
+            const maxRuns = 6;
+            let isRunning = true;
+
+            // --- Logic for Button 1 (Yes) ---
+            btnYes.addEventListener('click', () => {
+                alert("İŞTE BU! RİZE YOLCUSU KALMASIN!");
+            });
+
+            // --- Logic for Button 2 (No - The Runner) ---
+            
+            // Function to move button to random position
+            const teleportButton = () => {
+                if (!isRunning) return;
+
+                // Get viewport dimensions
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+
+                // Get button dimensions
+                const btnRect = btnNo.getBoundingClientRect();
+                const btnWidth = btnRect.width;
+                const btnHeight = btnRect.height;
+
+                // Calculate safe area (keep it somewhat on screen)
+                // We leave a padding of 20px
+                const maxX = viewportWidth - btnWidth - 40;
+                const maxY = viewportHeight - btnHeight - 40;
+
+                // Generate random coordinates
+                // Ensure it doesn't spawn exactly where it is (simple logic)
+                let newX = Math.random() * maxX + 20;
+                let newY = Math.random() * maxY + 20;
+
+                // Apply new position using fixed positioning for absolute freedom
+                btnNo.style.position = 'fixed';
+                btnNo.style.left = `${newX}px`;
+                btnNo.style.top = `${newY}px`;
+                
+                // Rotate slightly for fun effect
+                const rotation = Math.random() * 20 - 10;
+                btnNo.style.transform = `rotate(${rotation}deg)`;
+
+                runCount++;
+
+                // Check if we should stop running
+                if (runCount >= maxRuns) {
+                    isRunning = false;
+                    btnNo.style.transform = 'rotate(0deg)'; // Reset rotation
+                    
+                    // Show the "promise" message
+                    stopMessage.classList.remove('opacity-0');
+                    stopMessage.classList.add('opacity-100');
+                    
+                    // Change cursor to indicate it's clickable now
+                    btnNo.classList.remove('cursor-pointer');
+                    btnNo.classList.add('cursor-pointer'); // Ensure it stays pointer
+                }
+            };
+
+            // Event Listeners for the "Run" behavior
+            // We use mouseover for desktop and touchstart for mobile
+            const handleInteraction = (e) => {
+                if (isRunning) {
+                    // Prevent default touch actions to stop scrolling/zooming while chasing
+                    if(e.type === 'touchstart') e.preventDefault();
+                    teleportButton();
+                }
+            };
+
+            btnNo.addEventListener('mouseover', handleInteraction);
+            btnNo.addEventListener('touchstart', handleInteraction, {passive: false});
+
+            // --- Logic for Final Click (The Trap) ---
+            btnNo.addEventListener('click', () => {
+                if (!isRunning) {
+                    // The user finally clicked it after it stopped running
+                    
+                    // 1. Expand to fullscreen
+                    btnNo.classList.add('expand-fullscreen');
+                    btnNo.classList.remove('bg-red-600');
+                    btnNo.classList.add('bg-green-600', 'animate-glow');
+                    
+                    // 2. Change Text
+                    btnNo.innerText = "TAMAM LAN ALIYORUZ!";
+
+                    // 3. Redirect after animation (800ms matches CSS transition)
+                    setTimeout(() => {
+                        window.location.href = "https://www.vatanbilgisayar.com";
+                    }, 1500);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
